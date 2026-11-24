@@ -40,11 +40,10 @@ jobs:
             echo "$PROVISIONING_PROFILE_BASE64" | base64 --decode > "$PP_PATH"
 
             security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-            security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+            security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
             security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
             security import "$CERTIFICATE_PATH" -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
             security list-keychain -d user -s "$KEYCHAIN_PATH" $(security list-keychain -d user | tr -d '"')
-            security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
 
             mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
             cp "$PP_PATH" "$HOME/Library/MobileDevice/Provisioning Profiles/"
@@ -54,7 +53,7 @@ jobs:
 
       - name: Create and build Briefcase iOS project
         run: |
-          briefcase create iOS -r --no-input || true
+          briefcase create iOS --no-input
           briefcase update iOS --no-input
           briefcase build iOS --no-input
 
@@ -74,4 +73,3 @@ jobs:
             build/u3dconv/ios/xcode/build/
             dist/
           if-no-files-found: warn
-```[span_1](start_span)[span_1](end_span)
