@@ -1,0 +1,30 @@
+name: Test Python on Windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  test-python-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Check Python version and repo files
+        shell: pwsh
+        run: |
+          python --version
+          Get-ChildItem -Force
+
+      - name: Run Python smoke test
+        shell: pwsh
+        run: |
+          python -c "import sys, pathlib; print('Python OK:', sys.version); print('Files:', [p.name for p in pathlib.Path('.').iterdir()])"
