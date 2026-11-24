@@ -1,0 +1,79 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "u3dconv"
+version = "0.4.0"
+description = "Inspect, extract, convert and repack Unity3D (UnityFS) asset bundles."
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+dependencies = [
+    "UnityPy>=1.10.0",
+    "Pillow>=10.0.0",
+    "lz4>=4.0.0",
+    "etcpak",
+    "astc-encoder-py",
+    "texture2ddecoder",
+]
+
+[project.scripts]
+u3dconv = "u3dconv.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["u3dconv*"]
+
+[tool.setuptools.package-data]
+u3dconv = ["webui.html"]
+
+# ---------------------------------------------------------------------------
+# BeeWare Briefcase (iOS app). See docs/IOS_BUILD.md before building.
+#
+# Written against the Briefcase 0.3.x configuration schema. If `briefcase`
+# rejects a key, run `briefcase new` in an empty folder and compare: the
+# version pins it generates are the ones your installed Briefcase expects.
+# ---------------------------------------------------------------------------
+
+[tool.briefcase]
+project_name = "u3dconv"
+# Change these before building. Apple requires a unique reverse-DNS bundle ID.
+bundle = "com.example"
+version = "0.4.0"
+url = "https://example.com/u3dconv"
+license.file = "LICENSE"
+author = "Your Name"
+author_email = "you@example.com"
+
+[tool.briefcase.app.u3dconv-ios]
+# The app name must differ from the library package name ("u3dconv"): Briefcase
+# turns it into a Python module name, and two modules cannot share one.
+formal_name = "u3dconv"
+description = "Inspect and repack Unity3D asset bundles"
+long_description = """Local, on-device tool for inspecting Unity3D asset bundles,
+converting textures to PNG, and repacking edited textures into a new bundle.
+"""
+# The first entry is the app's entry module; the second is the u3dconv library
+# (including webui.html), copied into the app unchanged.
+sources = ["src/u3dconv_ios", "u3dconv"]
+requires = [
+    "UnityPy>=1.10.0",
+    "Pillow>=10.0.0",
+    "lz4>=4.0.0",
+    "etcpak",
+    "astc-encoder-py",
+    "texture2ddecoder",
+]
+
+[tool.briefcase.app.u3dconv-ios.iOS]
+requires = [
+    "toga-iOS>=0.4.5",
+    "std-nslog>=1.0.0",
+]
+
+# The page is served from http://127.0.0.1 inside the app. This allows plain-HTTP
+# loads to local addresses only; it does not disable App Transport Security for
+# the internet. Check the generated Info.plist after `briefcase create iOS`
+# (see docs/IOS_BUILD.md) in case your template already sets this key.
+[tool.briefcase.app.u3dconv-ios.iOS.info.NSAppTransportSecurity]
+NSAllowsLocalNetworking = true
